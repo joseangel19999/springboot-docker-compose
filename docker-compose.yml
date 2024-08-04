@@ -1,0 +1,36 @@
+version: "3.8"
+
+services:
+  dbmysql:
+    container_name: dbmysql
+    image: mysql:8.0.13
+    ports:
+      - "3307:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: 'jose123'
+      MYSQL_DATABASE: 'tiendadb'
+      MYSQL_USER: 'jose'
+      MYSQL_PASSWORD: 'jose123'
+    volumes:
+      - mysqldb:/var/lib/mysql
+    networks:
+      - my-net
+  springapp:
+    container_name: springapp
+    build: .
+    ports:
+      - 8088:8080
+    environment:
+      - DATABASE_URL=jdbc:mysql://dbmysql:3306/tiendadb?allowPublicKeyRetrieval=true&useSSL=false
+      - MYSQL_USER=root
+      - MYSQL_PASSWORD=jose123
+    depends_on:
+      - dbmysql
+    networks:
+      - my-net
+networks:
+  my-net:
+    external: true
+volumes:
+  mysqldb:
+    external: true
